@@ -6,9 +6,17 @@ export type HoleTarget = "thumb" | FrontHoleIndex;
 export interface Fingering {
   id: string;
   system: FingeringSystem;
+  /** Thumb hole on the rear face of the recorder. */
   thumb: HoleState;
-  /** Seven front holes, numbered from the mouthpiece down. */
+  /** Seven front holes, numbered 1–7 from top to bottom. */
   front: [HoleState, HoleState, HoleState, HoleState, HoleState, HoleState, HoleState];
+}
+
+export interface FingeringReference {
+  id: string;
+  label: string;
+  url: string;
+  note?: string;
 }
 
 export interface MusicalNote {
@@ -19,7 +27,7 @@ export interface MusicalNote {
   midi: number;
   frequency: number;
   fingering: Fingering;
-  fingeringSource: string;
+  fingeringSources: FingeringReference[];
   difficulty: 1 | 2 | 3 | 4;
 }
 
@@ -32,14 +40,15 @@ export function areFingeringsEqual(a: Fingering, b: Fingering): boolean {
 }
 
 export function halfHolesFor(fingering: Fingering): HoleTarget[] {
-  const halfHoles: HoleTarget[] = [];
-  if (fingering.thumb === "half") halfHoles.push("thumb");
+  const result: HoleTarget[] = [];
+  if (fingering.thumb === "half") result.push("thumb");
   fingering.front.forEach((state, index) => {
-    if (state === "half") halfHoles.push(index as FrontHoleIndex);
+    if (state === "half") result.push(index as FrontHoleIndex);
   });
-  return halfHoles;
+  return result;
 }
 
+/** Cycle open → closed → half → open, omitting half where it is not allowed. */
 export function nextHoleState(state: HoleState, allowHalf: boolean): HoleState {
   if (state === "open") return "closed";
   if (state === "closed") return allowHalf ? "half" : "open";
