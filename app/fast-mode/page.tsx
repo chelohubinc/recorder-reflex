@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { NOTES } from "@/features/music/data/notes";
 import { generateQuestionSequence } from "@/features/training/engine/question-sequence";
-import { completeQuestion, completeSession, recordAttempt, startSession, abandonSession } from "@/lib/progress";
+import { completeQuestion, completeSession, recordAttempt, startSession } from "@/lib/progress";
 import { monotonicNow } from "@/lib/clock";
 
 const DURATIONS = [30, 60, 120] as const;
@@ -47,10 +47,6 @@ export default function FastModePage() {
     return () => window.clearInterval(timer);
   }, [running, sessionId, duration]);
 
-  useEffect(() => {
-    if (!running || !sessionId) return;
-    return () => abandonSession(sessionId);
-  }, [running, sessionId]);
 
   useEffect(() => {
     if (running) noteStartedAt.current = monotonicNow();
@@ -75,7 +71,15 @@ export default function FastModePage() {
 
   function submitNote(wasPlayed: boolean) {
     if (!running || !sessionId || noteStartedAt.current === null) return;
-    const reactionMs = Math.max(0, monotonicNow() - noteStartedAt.current);
+    const nowMonotonic = monotonicNow();
+    if (startedAt.current !== null && nowMonotonic - startedAt.current >= duration * 1000) {
+      completeSession(sessionId);
+      setRemainingMs(0);
+      setRunning(false);
+      setFinished(true);
+      return;
+    }
+    const reactionMs = Math.max(0, nowMonotonic - noteStartedAt.current);
     const questionId = `${sessionId}-fast-${played + skipped + 1}`;
     const now = new Date().toISOString();
 
@@ -105,13 +109,13 @@ export default function FastModePage() {
       setSkipped((count) => count + 1);
     }
     setLastReaction(reactionMs);
-    setSequenceIndex((index) => {
-      if (index + 1 >= sequence.length) {
-        setSequence(makeSequence());
-        return 0;
-      }
-      return index + 1;
-    });
+    const nextIndex = sequenceIndex + 1;
+    if (nextIndex >= sequence.length) {
+      setSequence(makeSequence());
+      setSequenceIndex(0);
+    } else {
+      setSequenceIndex(nextIndex);
+    }
   }
 
   const minutes = Math.floor(remainingMs / 60_000);
