@@ -1,0 +1,217 @@
+/* Dedicated styles for the timed reflex route. Kept local to this page so its layout
+   does not depend on the dashboard stylesheet cascade. */
+.fast-page {
+  width: min(100%, 900px);
+  margin: 0 auto;
+  padding: 34px clamp(16px, 4vw, 36px) 52px;
+}
+.fast-page > h1 {
+  margin: 8px 0 7px;
+  color: var(--ink);
+  font-size: clamp(28px, 4vw, 36px);
+  line-height: 1.12;
+  letter-spacing: -1.25px;
+}
+.fast-page > .muted { max-width: 650px; font-size: 12px; }
+.fast-page .panel {
+  margin-top: 24px;
+  padding: clamp(20px, 4vw, 32px);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+}
+.fast-page .panel-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+.fast-page .panel h2,
+.fast-page .fast-summary h2 {
+  margin: 8px 0 6px;
+  font-size: clamp(18px, 2.4vw, 22px);
+  letter-spacing: -.5px;
+}
+.fast-page .focus-spark { color: var(--green); font-size: 30px; }
+.fast-page .duration-options { display: flex; flex-wrap: wrap; gap: 9px; }
+.fast-page .duration-option {
+  min-width: 76px;
+  min-height: 42px;
+  padding: 10px 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: border-color .16s, background .16s, color .16s, transform .16s;
+}
+.fast-page .duration-option:hover { border-color: var(--green); transform: translateY(-1px); }
+.fast-page .duration-option[aria-pressed="true"] {
+  border-color: var(--green);
+  background: var(--soft-green);
+  color: var(--green);
+  box-shadow: inset 0 0 0 1px var(--green);
+}
+.fast-page .panel > .muted { margin-top: 18px !important; font-size: 11px; }
+.fast-page .primary-button { min-height: 44px; padding: 0 18px; font-size: 12px; }
+.fast-page .fast-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 22px 0 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+}
+.fast-page .fast-timer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 1px;
+}
+.fast-page .fast-timer strong {
+  color: var(--green);
+  font-size: 22px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.5px;
+}
+.fast-page .fast-toolbar .duration-option {
+  min-width: 0;
+  min-height: 32px;
+  padding: 7px 10px;
+  cursor: default;
+}
+.fast-page .fast-progress {
+  height: 7px;
+  margin: 0 0 18px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: var(--line);
+}
+.fast-page .fast-progress i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--green);
+  transition: width .12s linear;
+}
+.fast-page .fast-stage {
+  padding: clamp(24px, 5vw, 44px);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+  text-align: center;
+}
+.fast-page .fast-stage > .eyebrow { margin-bottom: 12px; }
+.fast-page .fast-note {
+  margin: 12px 0 5px;
+  color: var(--green);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(76px, 14vw, 118px);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -3px;
+}
+.fast-page .fast-note sup {
+  margin-left: 5px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: .3em;
+  letter-spacing: 0;
+  vertical-align: super;
+}
+.fast-page .fast-instruction {
+  margin: 8px auto 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+.fast-page .fast-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 24px;
+}
+.fast-page .fast-controls .check-button {
+  width: min(340px, 100%);
+  min-height: 48px;
+  margin: 0;
+  border-radius: 10px;
+  font-size: 12px;
+}
+.fast-page .fast-controls .skip-button {
+  min-height: 42px;
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-size: 11px;
+}
+.fast-page .fast-controls .skip-button:hover { background: var(--bg); color: var(--ink); }
+.fast-page .fast-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 14px 0;
+}
+.fast-page .fast-metric {
+  min-width: 0;
+  padding: 15px 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  text-align: center;
+}
+.fast-page .fast-metric strong {
+  display: block;
+  color: var(--ink);
+  font-size: clamp(19px, 3vw, 25px);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.7px;
+}
+.fast-page .fast-metric span {
+  display: block;
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 9px;
+  line-height: 1.4;
+  letter-spacing: .55px;
+  text-transform: uppercase;
+}
+.fast-page .fast-footnote {
+  max-width: 620px;
+  margin: 14px auto 0;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.65;
+  text-align: center;
+}
+.fast-page .fast-summary { padding: 34px clamp(18px, 4vw, 40px); }
+.fast-page .fast-summary h2 { margin: 8px 0 4px; }
+.fast-page .fast-summary .fast-note { font-size: 64px; }
+.fast-page .fast-summary .primary-button { margin: 22px auto 0; }
+.fast-page button:focus-visible,
+.fast-page a:focus-visible {
+  outline: 3px solid var(--green);
+  outline-offset: 3px;
+}
+@media (max-width: 640px) {
+  .fast-page { padding: 24px 14px 36px; }
+  .fast-page .panel { padding: 19px 16px; }
+  .fast-page .fast-toolbar { align-items: flex-start; flex-direction: column; }
+  .fast-page .fast-metrics { gap: 7px; }
+  .fast-page .fast-metric { padding: 12px 6px; }
+  .fast-page .fast-metric span { font-size: 8px; letter-spacing: .2px; }
+  .fast-page .fast-controls { flex-direction: column; }
+  .fast-page .fast-controls .check-button,
+  .fast-page .fast-controls .skip-button { width: 100%; }
+}
