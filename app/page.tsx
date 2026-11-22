@@ -3,14 +3,22 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { NOTES } from "@/features/music/data/notes";
-import { areFingeringsEqual, halfHolesFor, type Fingering } from "@/features/music/types/fingering";
+import { type Fingering, halfHolesFor } from "@/features/music/types/fingering";
+import { evaluateFingering } from "@/features/training/engine/evaluate-fingering";
 import { generateQuestionSequence } from "@/features/training/engine/question-sequence";
 import { calculateProgressStatistics } from "@/features/progress/engine/statistics";
 import { useProgressSnapshot } from "@/lib/useProgress";
-import { completeQuestion, completeSession, recordAttempt, startSession } from "@/lib/progress";
+import {
+  abandonSession,
+  completeQuestion,
+  completeSession,
+  recordAttempt,
+  startSession,
+} from "@/lib/progress";
 import { RecorderDiagram } from "@/components/recorder/RecorderDiagram";
 
 const QUESTIONS_PER_SESSION = 10;
+
 const emptyFingering = (): Fingering => ({
   id: "answer",
   system: "german",
@@ -35,6 +43,7 @@ export default function Home() {
   const [lastReactionMs, setLastReactionMs] = useState(0);
   const [sessionCorrectCount, setSessionCorrectCount] = useState(0);
   const [sessionAttemptCount, setSessionAttemptCount] = useState(0);
+
   const questionStartedAt = useRef<number | null>(null);
   const lastAttemptAt = useRef<number | null>(null);
   const questionFinalized = useRef(false);
@@ -51,6 +60,7 @@ export default function Home() {
     document.documentElement.dataset.theme = dark ? "dark" : "light";
   }, [dark]);
 
+  // The timer starts after the question has been committed to the screen.
   useEffect(() => {
     if (!started || !currentNoteId) return;
 
@@ -69,14 +79,23 @@ export default function Home() {
     return () => window.clearInterval(timer);
   }, [started, questionKey, currentNoteId]);
 
+  // A session that is left before completion is explicitly marked as abandoned.
+  useEffect(() => {
+    if (!started || !sessionId) return;
+    return () => abandonSession(sessionId);
+  }, [started, sessionId]);
+
   const masteredIds = useMemo(
     () => new Set(stats.notes.filter((item) => item.mastered).map((item) => item.noteId)),
     [stats.notes],
   );
 
   function beginSession() {
+    if (started && sessionId) abandonSession(sessionId);
+
     const ids = generateQuestionSequence(NOTES.map((item) => item.id), QUESTIONS_PER_SESSION);
     const id = startSession(QUESTIONS_PER_SESSION);
+
     setSessionId(id);
     setQuestionIds(ids);
     setQuestionIndex(0);
@@ -91,7 +110,7 @@ export default function Home() {
     setStarted(true);
   }
 
-  function finalizeQuestion(correct: boolean, reactionTimeMs: number) {
+  function finalizeQuestion(correct: boolean, reactionTimeMs: number, finalAttemptCount: number) {
     if (questionFinalized.current || !sessionId || !currentNoteId) return;
 
     questionFinalized.current = true;
@@ -100,18 +119,19 @@ export default function Home() {
       questionId: `${sessionId}-q-${questionIndex + 1}`,
       noteId: currentNoteId,
       correct,
-      reactionTimeMs,
-      attemptCount,
+      reactionTimeMs: Math.round(reactionTimeMs),
+      attemptCount: finalAttemptCount,
       createdAt: new Date().toISOString(),
     });
+
     if (correct) setSessionCorrectCount((count) => count + 1);
   }
 
-  function checkPosition() {
+  function checkPosition(candidate: Fingering = answer) {
     if (questionFinalized.current || !sessionId || questionStartedAt.current === null) return;
 
     const now = performance.now();
-    const isCorrect = areFingeringsEqual(answer, note.fingering);
+    const evaluation = evaluateFingering(candidate, note.fingering);
     const attemptDuration = Math.max(0, now - (lastAttemptAt.current ?? questionStartedAt.current));
     const totalReaction = Math.max(0, now - questionStartedAt.current);
     const nextAttempt = attemptCount + 1;
@@ -120,25 +140,37 @@ export default function Home() {
       sessionId,
       questionId: `${sessionId}-q-${questionIndex + 1}`,
       noteId: note.id,
-      correct: isCorrect,
+      correct: evaluation.correct,
       reactionTimeMs: Math.round(attemptDuration),
       createdAt: new Date().toISOString(),
     });
+
     lastAttemptAt.current = now;
     setAttemptCount(nextAttempt);
     setSessionAttemptCount((count) => count + 1);
     setLastReactionMs(totalReaction);
 
-    if (isCorrect) {
-      finalizeQuestion(true, totalReaction);
+    if (evaluation.correct) {
+      finalizeQuestion(true, totalReaction, nextAttempt);
       setFeedback("correct");
     } else {
       setFeedback("wrong");
     }
   }
 
+  function handleAnswerChange(nextAnswer: Fingering) {
+    if (feedback === "correct" || questionFinalized.current) return;
+    setAnswer(nextAnswer);
+
+    // Reaching the exact fingering validates the answer immediately.
+    if (evaluateFingering(nextAnswer, note.fingering).correct) {
+      checkPosition(nextAnswer);
+    }
+  }
+
   function advanceQuestion() {
     const nextIndex = questionIndex + 1;
+
     if (nextIndex >= questionIds.length) {
       if (sessionId) completeSession(sessionId);
       setStarted(false);
@@ -157,13 +189,9 @@ export default function Home() {
 
   function skipQuestion() {
     if (feedback === "correct" || questionFinalized.current || questionStartedAt.current === null) return;
-    const reactionTime = Math.max(0, performance.now() - questionStartedAt.current);
-    finalizeQuestion(false, reactionTime);
-    advanceQuestion();
-  }
 
-  function finishAfterCorrect() {
-    if (feedback !== "correct") return;
+    const reactionTime = Math.max(0, performance.now() - questionStartedAt.current);
+    finalizeQuestion(false, reactionTime, attemptCount);
     advanceQuestion();
   }
 
@@ -179,7 +207,10 @@ export default function Home() {
         </Link>
         <div className="side-label">ESPACE DE TRAVAIL</div>
         <Link className="nav-link active" href="/"><span>⌂</span> Tableau de bord</Link>
-        <a className="nav-link" href="#training" onClick={(event) => { event.preventDefault(); document.getElementById("training")?.scrollIntoView({ behavior: "smooth" }); }}><span>◉</span> Entraînement</a>
+        <a className="nav-link" href="#training" onClick={(event) => {
+          event.preventDefault();
+          document.getElementById("training")?.scrollIntoView({ behavior: "smooth" });
+        }}><span>◉</span> Entraînement</a>
         <Link className="nav-link" href="/learn"><span>▤</span> Apprentissage</Link>
         <Link className="nav-link" href="/progress"><span>▥</span> Progression</Link>
 
@@ -203,7 +234,7 @@ export default function Home() {
         <header className="topbar">
           <div className="breadcrumb">Mon espace <span>/</span> <b>Vue d’ensemble</b></div>
           <div className="top-actions">
-            <span className="streak"><span>✦</span> {stats.sessionsStarted} sessions</span>
+            <span className="streak"><span>✦</span> {stats.sessionsStarted} séries commencées</span>
             <button className="avatar" aria-label="Profil">A</button>
           </div>
         </header>
@@ -228,7 +259,7 @@ export default function Home() {
               <div className="stat-top"><span>PRÉCISION</span><span className="stat-icon green">◎</span></div>
               <div className="stat-value">{accuracy}<small>%</small></div>
               <div className="stat-foot"><span className="positive">↑</span> Sur les questions terminées</div>
-              <div className="mini-bars">{[35,52,43,64,49,75,58,85,68,100,74,88].map((value, index) => <i key={index} style={{ height: `${value}%` }} />)}</div>
+              <div className="mini-bars">{[35,52,43,64,49,75,58,85,68,100,74,88].map((value,index)=><i key={index} style={{height:`${value}%`}}/>)}</div>
             </article>
             <article className="stat-card">
               <div className="stat-top"><span>TEMPS MOYEN · BONNES RÉPONSES</span><span className="stat-icon blue">◷</span></div>
@@ -240,7 +271,7 @@ export default function Home() {
               <div className="stat-top"><span>NOTES MAÎTRISÉES</span><span className="stat-icon amber">✦</span></div>
               <div className="stat-value">{stats.masteredNotes}<small> / 9</small></div>
               <div className="stat-foot">Au moins 3 questions, 80 % de réussite</div>
-              <div className="mastery-track"><i style={{ width: `${stats.masteredNotes / 9 * 100}%` }} /></div>
+              <div className="mastery-track"><i style={{width:`${stats.masteredNotes / 9 * 100}%`}}/></div>
             </article>
           </section>
 
@@ -273,14 +304,14 @@ export default function Home() {
               ) : (
                 <>
                   <div className="question-card">
-                    <div className="question-meta">QUESTION {String(questionIndex + 1).padStart(2, "0")} / {questionIds.length} <span>•</span> SYSTÈME ALLEMAND</div>
+                    <div className="question-meta">QUESTION {String(questionIndex + 1).padStart(2,"0")} / {questionIds.length} <span>•</span> SYSTÈME ALLEMAND</div>
                     <div className="note-name">{note.name}<sup>{note.octave}</sup></div>
                     <div className="question-prompt">Reproduis son doigté sur la flûte</div>
                   </div>
 
                   <RecorderDiagram
                     value={answer}
-                    onChange={setAnswer}
+                    onChange={handleAnswerChange}
                     interactive={feedback !== "correct"}
                     expected={feedback === "wrong" ? note.fingering : undefined}
                     halfAllowed={halfHolesFor(note.fingering)}
@@ -290,20 +321,20 @@ export default function Home() {
                     <div className="feedback correct">
                       <span>✓ Bonne position !</span>
                       <small>Réponse finale en {(lastReactionMs / 1000).toFixed(2)} s · {attemptCount} tentative(s)</small>
-                      <button onClick={finishAfterCorrect}>Question suivante →</button>
+                      <button onClick={advanceQuestion}>Question suivante →</button>
                     </div>
                   ) : feedback === "wrong" ? (
                     <div className="feedback wrong">
                       <span>↻ Pas tout à fait</span>
-                      <small>Les trous entourés en rouge ne correspondent pas. Corrige ta position puis vérifie à nouveau.</small>
+                      <small>Les trous entourés en rouge ne correspondent pas. Corrige ta position ou passe cette note.</small>
                       <div className="feedback-actions">
-                        <button onClick={checkPosition}>Vérifier à nouveau</button>
+                        <button onClick={() => checkPosition()}>Vérifier à nouveau</button>
                         <button className="secondary-button" onClick={skipQuestion}>Passer cette note</button>
                       </div>
                     </div>
                   ) : (
                     <div className="exercise-actions">
-                      <button className="check-button" onClick={checkPosition}>Vérifier ma position <span>↵</span></button>
+                      <button className="check-button" onClick={() => checkPosition()}>Vérifier ma position <span>↵</span></button>
                       <button className="skip-button" onClick={skipQuestion}>Passer la note</button>
                     </div>
                   )}
@@ -320,7 +351,7 @@ export default function Home() {
                 <p className="muted">Tes réponses sont sauvegardées sur cet appareil.</p>
                 <div className="focus-number">{stats.questionsCompleted}<small> questions terminées</small></div>
                 <div className="focus-line"><span>Précision globale</span><b>{accuracy}%</b></div>
-                <div className="progress-track"><i style={{ width: `${accuracy}%` }} /></div>
+                <div className="progress-track"><i style={{width:`${accuracy}%`}}/></div>
                 <Link href="/progress" className="text-link">Voir ma progression <span>→</span></Link>
               </article>
 
@@ -332,7 +363,7 @@ export default function Home() {
                 <div className="note-chips">
                   {NOTES.map((item) => <span key={item.id} className={masteredIds.has(item.id) ? "learned" : ""}>{item.name}<sup>{item.octave}</sup></span>)}
                 </div>
-                <div className="note-range"><span>C5</span><i /><span>D6</span></div>
+                <div className="note-range"><span>C5</span><i/><span>D6</span></div>
               </article>
             </div>
           </section>
