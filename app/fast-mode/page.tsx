@@ -1,5 +1,6 @@
 "use client";
 
+import "./fast-mode.css";
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { NOTES } from "@/features/music/data/notes";
