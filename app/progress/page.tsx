@@ -30,7 +30,12 @@ export default function ProgressPage() {
         <article className="stat-card">
           <div className="stat-top">SÉRIES TERMINÉES</div>
           <div className="stat-value">{stats.sessionsCompleted}</div>
-          <div className="stat-foot">{stats.sessionsStarted} séries commencées au total</div>
+          <div className="stat-foot">{stats.sessionsStarted} commencées au total</div>
+          <div className="session-breakdown">
+            <span><i className="session-dot completed" /> {stats.sessionsCompleted} terminées</span>
+            <span><i className="session-dot active" /> {stats.sessionsInProgress} en cours</span>
+            <span><i className="session-dot abandoned" /> {stats.sessionsAbandoned} abandonnées</span>
+          </div>
         </article>
       </section>
 

@@ -3,7 +3,6 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { RecorderDiagram } from "./RecorderDiagram";
 import { NOTES } from "@/features/music/data/notes";
-import { halfHolesFor } from "@/features/music/types/fingering";
 
 describe("RecorderDiagram", () => {
   it("separates the rear thumb from the seven front holes", () => {
@@ -24,7 +23,6 @@ describe("RecorderDiagram", () => {
       value: note.fingering,
       onChange: () => undefined,
       interactive: false,
-      halfAllowed: halfHolesFor(note.fingering),
     }));
 
     const buttons = [...markup.matchAll(/<button\b[^>]*class="([^"]*recorder-hole[^"]*)"[^>]*>/g)];
@@ -33,5 +31,16 @@ describe("RecorderDiagram", () => {
     note.fingering.front.forEach((state, index) => {
       expect(buttons[index + 1][1]).toContain(state);
     });
+  });
+
+  it("exposes an interactive three-state hole control", () => {
+    const markup = renderToStaticMarkup(createElement(RecorderDiagram, {
+      value: NOTES[0].fingering,
+      onChange: () => undefined,
+      interactive: true,
+    }));
+    expect(markup).toContain("À moitié");
+    expect(markup).toContain("modifier");
+    expect(markup).toContain('aria-label="Trou frontal 1, fermé, modifier"');
   });
 });

@@ -16,6 +16,8 @@ describe("calculateProgressStatistics", () => {
     ];
     progress.sessions = [
       { id: "s1", startedAt: "2026-01-01T00:00:00Z", completedAt: "2026-01-01T00:00:03Z", status: "completed", totalQuestions: 10, completedQuestions: 2 },
+      { id: "s2", startedAt: "2026-01-02T00:00:00Z", completedAt: null, status: "in-progress", totalQuestions: 10, completedQuestions: 1 },
+      { id: "s3", startedAt: "2026-01-03T00:00:00Z", completedAt: "2026-01-03T00:01:00Z", status: "abandoned", totalQuestions: 10, completedQuestions: 4 },
     ];
 
     const stats = calculateProgressStatistics(progress, NOTES);
@@ -23,8 +25,10 @@ describe("calculateProgressStatistics", () => {
     expect(stats.averageQuestionReactionMs).toBe(1900);
     expect(stats.averageCorrectReactionMs).toBe(1200);
     expect(stats.averageAttemptReactionMs).toBe(600);
-    expect(stats.sessionsStarted).toBe(1);
+    expect(stats.sessionsStarted).toBe(3);
     expect(stats.sessionsCompleted).toBe(1);
+    expect(stats.sessionsInProgress).toBe(1);
+    expect(stats.sessionsAbandoned).toBe(1);
   });
 
   it("preserves historical sessions separately from new session statuses", () => {
@@ -32,5 +36,6 @@ describe("calculateProgressStatistics", () => {
     progress.legacySessionCount = 7;
     expect(calculateProgressStatistics(progress, NOTES).sessionsStarted).toBe(7);
     expect(calculateProgressStatistics(progress, NOTES).sessionsCompleted).toBe(0);
+    expect(calculateProgressStatistics(progress, NOTES).sessionsAbandoned).toBe(0);
   });
 });

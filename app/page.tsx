@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { NOTES } from "@/features/music/data/notes";
-import { type Fingering, halfHolesFor } from "@/features/music/types/fingering";
+import { type Fingering } from "@/features/music/types/fingering";
 import { evaluateFingering } from "@/features/training/engine/evaluate-fingering";
 import { generateQuestionSequence } from "@/features/training/engine/question-sequence";
 import { calculateProgressStatistics } from "@/features/progress/engine/statistics";
@@ -198,6 +198,7 @@ export default function Home() {
 
   const accuracy = stats.accuracy;
   const averageReaction = stats.averageCorrectReactionMs / 1000;
+  const recentResults = progress.answers.slice(-12);
 
   return (
     <main className="app-shell">
@@ -260,7 +261,7 @@ export default function Home() {
               <div className="stat-top"><span>PRÉCISION</span><span className="stat-icon green">◎</span></div>
               <div className="stat-value">{accuracy}<small>%</small></div>
               <div className="stat-foot"><span className="positive">↑</span> Sur les questions terminées</div>
-              <div className="mini-bars">{[35,52,43,64,49,75,58,85,68,100,74,88].map((value,index)=><i key={index} style={{height:`${value}%`}}/>)}</div>
+              <div className="mini-bars" role="img" aria-label="Résultats des douze dernières questions">{recentResults.map((result,index)=><i key={result.id} className={result.correct ? "correct" : "incorrect"} title={result.correct ? "Bonne réponse" : "Réponse incorrecte"} style={{height: result.correct ? "100%" : "24%"}} />)}</div>
             </article>
             <article className="stat-card">
               <div className="stat-top"><span>TEMPS MOYEN · BONNES RÉPONSES</span><span className="stat-icon blue">◷</span></div>
@@ -269,10 +270,10 @@ export default function Home() {
               <div className="stat-spark">⌁</div>
             </article>
             <article className="stat-card">
-              <div className="stat-top"><span>NOTES MAÎTRISÉES</span><span className="stat-icon amber">✦</span></div>
-              <div className="stat-value">{stats.masteredNotes}<small> / 9</small></div>
-              <div className="stat-foot">Au moins 3 questions, 80 % de réussite</div>
-              <div className="mastery-track"><i style={{width:`${stats.masteredNotes / 9 * 100}%`}}/></div>
+              <div className="stat-top"><span>SÉRIES TERMINÉES</span><span className="stat-icon amber">✦</span></div>
+              <div className="stat-value">{stats.sessionsCompleted}</div>
+              <div className="stat-foot">{stats.sessionsInProgress} en cours · {stats.sessionsAbandoned} abandonnées</div>
+              <div className="mastery-track"><i style={{width:`${stats.sessionsStarted ? stats.sessionsCompleted / stats.sessionsStarted * 100 : 0}%`}}/></div>
             </article>
           </section>
 
@@ -315,7 +316,6 @@ export default function Home() {
                     onChange={handleAnswerChange}
                     interactive={feedback !== "correct"}
                     expected={feedback === "wrong" ? note.fingering : undefined}
-                    halfAllowed={halfHolesFor(note.fingering)}
                   />
 
                   {feedback === "correct" ? (

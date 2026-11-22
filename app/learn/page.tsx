@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { NOTES } from "@/features/music/data/notes";
 import { RecorderDiagram } from "@/components/recorder/RecorderDiagram";
-import { halfHolesFor } from "@/features/music/types/fingering";
 
 export default function LearnPage() {
   return (
@@ -22,7 +21,6 @@ export default function LearnPage() {
                 value={note.fingering}
                 onChange={() => undefined}
                 interactive={false}
-                halfAllowed={halfHolesFor(note.fingering)}
               />
               <p>Difficulté {note.difficulty} / 4</p>
               <p className="source-note">

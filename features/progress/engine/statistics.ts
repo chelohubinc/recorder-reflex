@@ -20,6 +20,7 @@ export interface ProgressStatistics {
   sessionsStarted: number;
   sessionsCompleted: number;
   sessionsInProgress: number;
+  sessionsAbandoned: number;
   masteredNotes: number;
   notes: NoteStatistics[];
 }
@@ -54,6 +55,7 @@ export function calculateProgressStatistics(progress: Progress, notes: readonly 
     sessionsStarted: progress.legacySessionCount + progress.sessions.length,
     sessionsCompleted: progress.sessions.filter((session) => session.status === "completed").length,
     sessionsInProgress: progress.sessions.filter((session) => session.status === "in-progress").length,
+    sessionsAbandoned: progress.sessions.filter((session) => session.status === "abandoned").length,
     masteredNotes: noteStatistics.filter((note) => note.mastered).length,
     notes: noteStatistics,
   };

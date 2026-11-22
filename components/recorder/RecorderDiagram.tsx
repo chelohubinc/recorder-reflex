@@ -12,7 +12,6 @@ interface RecorderDiagramProps {
   onChange: (value: Fingering) => void;
   interactive?: boolean;
   expected?: Fingering;
-  halfAllowed?: readonly HoleTarget[];
 }
 
 const stateLabel = (state: HoleState) =>
@@ -23,7 +22,6 @@ export function RecorderDiagram({
   onChange,
   interactive = true,
   expected,
-  halfAllowed = [],
 }: RecorderDiagramProps) {
   function setHole(target: HoleTarget, state: HoleState) {
     if (!interactive) return;
@@ -47,7 +45,7 @@ export function RecorderDiagram({
     const mismatch = expectedState !== undefined && expectedState !== state;
     const match = expectedState !== undefined && expectedState === state;
     const feedbackClass = mismatch ? " hole-wrong" : match ? " hole-right" : "";
-    const nextState = nextHoleState(state, halfAllowed.includes(target));
+    const nextState = nextHoleState(state, true);
 
     return (
       <button
@@ -67,14 +65,16 @@ export function RecorderDiagram({
 
   return (
     <div className="recorder-wrap">
+      <div className="diagram-face-labels" aria-hidden="true">
+        <span>FACE ARRIÈRE · POUCE</span>
+        <span>FACE AVANT</span>
+      </div>
       <div className="recorder-visual" role="group" aria-label="Schéma de la flûte à bec">
         <div className="recorder-body" aria-hidden="true" />
         <div className="thumb-rail">
-          <span className="hole-caption">FACE ARRIÈRE · POUCE</span>
           {renderHole(value.thumb, "thumb", "Trou arrière du pouce", expected?.thumb)}
         </div>
         <div className="front-rail">
-          <span className="hole-caption face-front-label">FACE AVANT</span>
           {value.front.map((state, index) => (
             <div className="front-hole-row" key={index}>
               {renderHole(state, index as HoleTarget, `Trou frontal ${index + 1}`, expected?.front[index])}
