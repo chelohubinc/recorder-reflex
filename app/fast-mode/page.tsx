@@ -16,7 +16,7 @@ export default function FastModePage() {
   const [running, setRunning] = useState(false);
   const [finished, setFinished] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(null);
-  const [sequence, setSequence] = useState<string[]>(makeSequence);
+  const [sequence, setSequence] = useState<string[]>([]);
   const [sequenceIndex, setSequenceIndex] = useState(0);
   const [remainingMs, setRemainingMs] = useState(60_000);
   const [played, setPlayed] = useState(0);
