@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { RecorderDiagram } from "@/components/recorder/RecorderDiagram";
-import type { Fingering, HoleTarget } from "@/features/music/types/fingering";
+import type { Fingering } from "@/features/music/types/fingering";
 
 const initial: Fingering = {
   id: "lab",
@@ -11,8 +11,6 @@ const initial: Fingering = {
   thumb: "open",
   front: ["open", "open", "open", "open", "open", "open", "open"],
 };
-const allHoles: HoleTarget[] = ["thumb", 0, 1, 2, 3, 4, 5, 6];
-
 export default function LabPage() {
   const [fingering, setFingering] = useState(initial);
   const coveredCount = [fingering.thumb, ...fingering.front].filter((state) => state !== "open").length;
@@ -24,7 +22,7 @@ export default function LabPage() {
       <h1>Flûte interactive</h1>
       <p className="muted">Clique sur les trous pour passer entre ouvert, couvert et demi-couvert.</p>
       <section className="panel" style={{ maxWidth: 480, marginTop: 20 }}>
-        <RecorderDiagram value={fingering} onChange={setFingering} halfAllowed={allHoles} />
+        <RecorderDiagram value={fingering} onChange={setFingering} />
         <div className="focus-line" style={{ marginTop: 18 }}>
           <span>Trous couverts ou partiellement couverts</span>
           <b>{coveredCount} / 8</b>
