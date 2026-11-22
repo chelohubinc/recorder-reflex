@@ -16,6 +16,7 @@ import {
   startSession,
 } from "@/lib/progress";
 import { RecorderDiagram } from "@/components/recorder/RecorderDiagram";
+import { monotonicNow } from "@/lib/clock";
 
 const QUESTIONS_PER_SESSION = 10;
 
@@ -53,7 +54,8 @@ export default function Home() {
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("recorder-reflex-theme");
-    setDark(savedTheme === "dark");
+    const frame = window.requestAnimationFrame(() => setDark(savedTheme === "dark"));
+    return () => window.cancelAnimationFrame(frame);
   }, []);
 
   useEffect(() => {
@@ -64,15 +66,14 @@ export default function Home() {
   useEffect(() => {
     if (!started || !currentNoteId) return;
 
-    const now = performance.now();
+    const now = monotonicNow();
     questionStartedAt.current = now;
     lastAttemptAt.current = now;
     questionFinalized.current = false;
-    setElapsedMs(0);
 
     const timer = window.setInterval(() => {
       if (!questionFinalized.current && questionStartedAt.current !== null) {
-        setElapsedMs(performance.now() - questionStartedAt.current);
+        setElapsedMs(monotonicNow() - questionStartedAt.current);
       }
     }, 50);
 
@@ -130,7 +131,7 @@ export default function Home() {
   function checkPosition(candidate: Fingering = answer) {
     if (questionFinalized.current || !sessionId || questionStartedAt.current === null) return;
 
-    const now = performance.now();
+    const now = monotonicNow();
     const evaluation = evaluateFingering(candidate, note.fingering);
     const attemptDuration = Math.max(0, now - (lastAttemptAt.current ?? questionStartedAt.current));
     const totalReaction = Math.max(0, now - questionStartedAt.current);
@@ -190,7 +191,7 @@ export default function Home() {
   function skipQuestion() {
     if (feedback === "correct" || questionFinalized.current || questionStartedAt.current === null) return;
 
-    const reactionTime = Math.max(0, performance.now() - questionStartedAt.current);
+    const reactionTime = Math.max(0, monotonicNow() - questionStartedAt.current);
     finalizeQuestion(false, reactionTime, attemptCount);
     advanceQuestion();
   }
