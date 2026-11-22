@@ -261,7 +261,7 @@ export default function Home() {
               <div className="stat-top"><span>PRÉCISION</span><span className="stat-icon green">◎</span></div>
               <div className="stat-value">{accuracy}<small>%</small></div>
               <div className="stat-foot"><span className="positive">↑</span> Sur les questions terminées</div>
-              <div className="mini-bars" role="img" aria-label="Résultats des douze dernières questions">{recentResults.map((result,index)=><i key={result.id} className={result.correct ? "correct" : "incorrect"} title={result.correct ? "Bonne réponse" : "Réponse incorrecte"} style={{height: result.correct ? "100%" : "24%"}} />)}</div>
+              <div className="mini-bars" role="img" aria-label="Résultats des douze dernières questions">{recentResults.map((result)=><i key={result.id} className={result.correct ? "correct" : "incorrect"} title={result.correct ? "Bonne réponse" : "Réponse incorrecte"} style={{height: result.correct ? "100%" : "24%"}} />)}</div>
             </article>
             <article className="stat-card">
               <div className="stat-top"><span>TEMPS MOYEN · BONNES RÉPONSES</span><span className="stat-icon blue">◷</span></div>
