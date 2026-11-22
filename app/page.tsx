@@ -270,10 +270,10 @@ export default function Home() {
               <div className="stat-spark">⌁</div>
             </article>
             <article className="stat-card">
-              <div className="stat-top"><span>SÉRIES TERMINÉES</span><span className="stat-icon amber">✦</span></div>
-              <div className="stat-value">{stats.sessionsCompleted}</div>
-              <div className="stat-foot">{stats.sessionsInProgress} en cours · {stats.sessionsAbandoned} abandonnées</div>
-              <div className="mastery-track"><i style={{width:`${stats.sessionsStarted ? stats.sessionsCompleted / stats.sessionsStarted * 100 : 0}%`}}/></div>
+              <div className="stat-top"><span>NOTES MAÎTRISÉES</span><span className="stat-icon amber">✦</span></div>
+              <div className="stat-value">{stats.masteredNotes}<small> / 9</small></div>
+              <div className="stat-foot">Au moins 3 questions, 80 % de réussite</div>
+              <div className="mastery-track"><i style={{width:`${stats.masteredNotes / 9 * 100}%`}}/></div>
             </article>
           </section>
 
@@ -353,6 +353,11 @@ export default function Home() {
                 <div className="focus-number">{stats.questionsCompleted}<small> questions terminées</small></div>
                 <div className="focus-line"><span>Précision globale</span><b>{accuracy}%</b></div>
                 <div className="progress-track"><i style={{width:`${accuracy}%`}}/></div>
+                <div className="session-breakdown">
+                  <span><i className="session-dot completed" /> {stats.sessionsCompleted} terminées</span>
+                  <span><i className="session-dot active" /> {stats.sessionsInProgress} en cours</span>
+                  <span><i className="session-dot abandoned" /> {stats.sessionsAbandoned} abandonnées</span>
+                </div>
                 <Link href="/progress" className="text-link">Voir ma progression <span>→</span></Link>
               </article>
 
