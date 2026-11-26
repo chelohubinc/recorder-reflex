@@ -210,6 +210,7 @@ export default function Home() {
         <div className="side-label">ESPACE DE TRAVAIL</div>
         <Link className="nav-link active" href="/"><span>⌂</span> Tableau de bord</Link>
         <Link className="nav-link" href="/fast-mode"><span>⚡</span> Notes enchaînées</Link>
+        <Link className="nav-link" href="/reflex"><span>⚡</span> Reflex</Link>
         <a className="nav-link" href="#training" onClick={(event) => {
           event.preventDefault();
           document.getElementById("training")?.scrollIntoView({ behavior: "smooth" });

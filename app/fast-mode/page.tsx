@@ -163,7 +163,7 @@ export default function FastModePage() {
             <div className="fast-note">{note.name}<sup>{note.octave}</sup></div>
             <p className="fast-instruction">Joue cette note sur ta flûte à bec soprano.</p>
             <div className="fast-controls">
-              <button className="check-button" onClick={() => submitNote(true)}>✓ J'ai joué cette note</button>
+              <button className="check-button" onClick={() => submitNote(true)}>✓ J&apos;ai joué cette note</button>
               <button className="skip-button" onClick={() => submitNote(false)}>Passer →</button>
             </div>
             {lastReaction !== null && <p className="fast-footnote">Dernière réaction : {(lastReaction / 1000).toFixed(2)} s</p>}
@@ -173,7 +173,7 @@ export default function FastModePage() {
             <div className="fast-metric"><strong>{averageReaction ? (averageReaction / 1000).toFixed(2) + " s" : "—"}</strong><span>Réaction moyenne</span></div>
             <div className="fast-metric"><strong>{bestReaction !== null ? (bestReaction / 1000).toFixed(2) + " s" : "—"}</strong><span>Meilleure réaction</span></div>
           </div>
-          <p className="fast-footnote">Le chronomètre tourne en continu. La validation est manuelle : l'application ne détecte pas encore la hauteur jouée par le micro.</p>
+          <p className="fast-footnote">Le chronomètre tourne en continu. La validation est manuelle : l&apos;application ne détecte pas encore la hauteur jouée par le micro.</p>
         </>
       )}
 
