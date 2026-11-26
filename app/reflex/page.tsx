@@ -123,48 +123,19 @@ export default function ReflexPage() {
     const stream = await navigator.mediaDevices.getUserMedia({
       audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false },
     });
-    const context = new AudioContext();
+    let context: AudioContext | null = null;
     try {
+      context = new AudioContext();
       await context.resume();
-      const analyser = context.createAnalyser();
-      analyser.fftSize = 4096;
-      analyser.smoothingTimeConstant = 0;
-      context.createMediaStreamSource(stream).connect(analyser);
-      const samples = new Float32Array(analyser.fftSize);
       streamRef.current = stream;
       contextRef.current = context;
       setListening(true);
-      const analyze = () => {
-        if (ended.current || contextRef.current !== context) return;
-        analyser.getFloatTimeDomainData(samples);
-        const estimate = detectPitch(samples, context.sampleRate);
-        if (estimate && estimate.clarity >= 0.65) {
-          const pitch = describePitch(estimate.frequency);
-          setDetected(`${pitch.name}${pitch.octave}`);
-          if (isMatchingRecorderNote(pitch.midi, pitch.cents, note.midi)) {
-            const previous = candidateRef.current;
-            candidateRef.current = previous?.midi === pitch.midi
-              ? { midi: pitch.midi, count: previous.count + 1 }
-              : { midi: pitch.midi, count: 1 };
-            if (candidateRef.current.count >= 4 && !resolvingRef.current) {
-              advanceRef.current(true);
-            }
-          } else {
-            candidateRef.current = null;
-          }
-        } else {
-          candidateRef.current = null;
-          setDetected(null);
-        }
-        frameRef.current = requestAnimationFrame(analyze);
-      };
-      analyze();
     } catch (error) {
       stream.getTracks().forEach((track) => track.stop());
-      if (context.state !== "closed") await context.close();
+      if (context && context.state !== "closed") await context.close();
       throw error;
     }
-  }, [note.midi]);
+  }, []);
 
   async function begin() {
     setMicError(null);
