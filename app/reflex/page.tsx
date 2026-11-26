@@ -86,7 +86,10 @@ export default function ReflexPage() {
     setFeedback(wasCorrect ? "Bonne hauteur détectée !" : "Note passée. Continue !");
     window.setTimeout(() => { resolvingRef.current = false; }, 180);
   }, [sequence, sequenceIndex]);
-  advanceRef.current = advanceNote;
+
+  useEffect(() => {
+    advanceRef.current = advanceNote;
+  }, [advanceNote]);
 
   useEffect(() => {
     if (!running || startedAt.current === null) return;
@@ -285,7 +288,7 @@ export default function ReflexPage() {
               ) : (
                 <button className="check-button" onClick={pauseChallenge}><Pause aria-hidden="true" /> Pause</button>
               )}
-              <button className="skip-button" onClick={() => advanceNote(false)} disabled={paused}><SkipForward aria-hidden="true" /> Passer</button>
+              <button className="skip-button flex items-center gap-2" onClick={() => advanceNote(false)} disabled={paused}><SkipForward aria-hidden="true" /> Passer</button>
               <button className="skip-button" onClick={abandonChallenge}>Abandonner</button>
             </div>
           </section>
