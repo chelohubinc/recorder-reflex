@@ -12,21 +12,17 @@ import { monotonicNow } from "@/lib/clock";
 
 const DURATIONS = [30, 60, 120] as const;
 type Duration = typeof DURATIONS[number];
-const NOTE_DURATIONS = [2, 4, 6] as const;
-type NoteDuration = typeof NOTE_DURATIONS[number];
 const makeSequence = (previousNoteId?: string) =>
   generateQuestionSequence(NOTES.map((note) => note.id), 500, Math.random, previousNoteId);
 
 export default function ReflexPage() {
   const [duration, setDuration] = useState<Duration>(60);
-  const [noteDuration, setNoteDuration] = useState<NoteDuration>(4);
   const [running, setRunning] = useState(false);
   const [paused, setPaused] = useState(false);
   const [finished, setFinished] = useState(false);
   const [sequence, setSequence] = useState<string[]>([]);
   const [sequenceIndex, setSequenceIndex] = useState(0);
   const [remainingMs, setRemainingMs] = useState(60_000);
-  const [remainingNoteMs, setRemainingNoteMs] = useState(4_000);
   const [correct, setCorrect] = useState(0);
   const [passed, setPassed] = useState(0);
   const [detected, setDetected] = useState<string | null>(null);
@@ -34,7 +30,6 @@ export default function ReflexPage() {
   const [micError, setMicError] = useState<string | null>(null);
   const [listening, setListening] = useState(false);
   const startedAt = useRef<number | null>(null);
-  const noteStartedAt = useRef<number | null>(null);
   const pausedAt = useRef<number | null>(null);
   const ended = useRef(true);
   const streamRef = useRef<MediaStream | null>(null);
@@ -86,13 +81,11 @@ export default function ReflexPage() {
     } else {
       setSequenceIndex(nextIndex);
     }
-    noteStartedAt.current = monotonicNow();
-    setRemainingNoteMs(noteDuration * 1000);
     candidateRef.current = null;
     setDetected(null);
     setFeedback(wasCorrect ? "Bonne hauteur détectée !" : "Note passée. Continue !");
     window.setTimeout(() => { resolvingRef.current = false; }, 180);
-  }, [sequence, sequenceIndex, noteDuration]);
+  }, [sequence, sequenceIndex]);
   advanceRef.current = advanceNote;
 
   useEffect(() => {
@@ -106,15 +99,6 @@ export default function ReflexPage() {
     return () => window.clearInterval(timer);
   }, [running, duration, finishChallenge]);
 
-  // The per-note timer is a pacing guide only; it never skips a note automatically.
-  useEffect(() => {
-    if (!running || ended.current || noteStartedAt.current === null) return;
-    const timer = window.setInterval(() => {
-      const elapsed = monotonicNow() - noteStartedAt.current!;
-      setRemainingNoteMs(Math.max(0, noteDuration * 1000 - elapsed));
-    }, 80);
-    return () => window.clearInterval(timer);
-  }, [running, noteDuration, sequenceIndex]);
 
   const startMicrophone = useCallback(async () => {
     if (!navigator.mediaDevices?.getUserMedia) {
@@ -146,11 +130,9 @@ export default function ReflexPage() {
       setCorrect(0);
       setPassed(0);
       setRemainingMs(duration * 1000);
-      setRemainingNoteMs(noteDuration * 1000);
       ended.current = false;
       resolvingRef.current = false;
       startedAt.current = monotonicNow();
-      noteStartedAt.current = monotonicNow();
       pausedAt.current = null;
       setFeedback("Joue la note affichée. Le défi avance quand la bonne hauteur est reconnue.");
       setFinished(false);
@@ -181,7 +163,6 @@ export default function ReflexPage() {
     const now = monotonicNow();
     const pauseDuration = now - (pausedAt.current ?? now);
     if (startedAt.current !== null) startedAt.current += pauseDuration;
-    noteStartedAt.current = now - (noteDuration * 1000 - remainingNoteMs);
     pausedAt.current = null;
     try {
       await contextRef.current?.resume();
@@ -199,7 +180,6 @@ export default function ReflexPage() {
   function abandonChallenge() {
     ended.current = true;
     startedAt.current = null;
-    noteStartedAt.current = null;
     pausedAt.current = null;
     stopAudio();
     setRunning(false);
@@ -210,7 +190,6 @@ export default function ReflexPage() {
     setCorrect(0);
     setPassed(0);
     setRemainingMs(duration * 1000);
-    setRemainingNoteMs(noteDuration * 1000);
   }
 
   // Restart the analyser loop after a pause without requesting microphone permission again.
@@ -261,7 +240,6 @@ export default function ReflexPage() {
   const minutes = Math.floor(remainingMs / 60_000);
   const seconds = Math.floor((remainingMs % 60_000) / 1000);
   const progressPercent = Math.max(0, Math.min(100, (remainingMs / (duration * 1000)) * 100));
-  const progressPercentNote = Math.max(0, Math.min(100, (remainingNoteMs / (noteDuration * 1000)) * 100));
 
   return (
     <main className="simple-page fast-page">
@@ -283,13 +261,7 @@ export default function ReflexPage() {
               </button>
             ))}
           </div>
-          <div className="panel-title-row"><h2>Temps conseillé par note</h2></div>
-          <div className="duration-options" style={{ marginTop: 18 }}>
-            {NOTE_DURATIONS.map((value) => (
-              <button key={value} className="duration-option" aria-pressed={noteDuration === value} onClick={() => setNoteDuration(value)}>{`${value} s`}</button>
-            ))}
-          </div>
-          <p className="muted" style={{ marginTop: 16 }}>Do5 à Ré6 · doigtés allemands · validation après 4 détections stables à ±45 cents.</p>
+          <p className="muted" style={{ marginTop: 16 }}>Do5 à Ré6 · doigtés allemands · validation après 8 détections stables à ±45 cents.</p>
           {micError && <p role="alert" className="mic-error">{micError}</p>}
           <button className="primary-button" style={{ marginTop: 20 }} onClick={begin}>Autoriser le micro et démarrer <ArrowRight aria-hidden="true" /></button>
         </section>
@@ -303,7 +275,6 @@ export default function ReflexPage() {
           </div>
           <div className="fast-progress"><i style={{ width: `${progressPercent}%` }} /></div>
           <section className="fast-stage">
-            <div className="fast-progress"><i style={{ width: `${progressPercentNote}%` }} /></div>
             <div className="eyebrow">NOTE {correct + passed + 1} · SYSTÈME ALLEMAND</div>
             <div className="fast-note">{note.name}<sup>{note.octave}</sup></div>
             <p className="fast-instruction">{paused ? "Défi en pause." : feedback}</p>
@@ -318,7 +289,7 @@ export default function ReflexPage() {
               <button className="skip-button" onClick={abandonChallenge}>Abandonner</button>
             </div>
           </section>
-          <p className="fast-footnote">Le défi avance uniquement si la bonne hauteur est détectée de façon stable ou si tu appuies sur « Passer ». Le temps par note est indicatif ; seul le chronomètre global termine le défi.</p>
+          <p className="fast-footnote">Le défi avance uniquement si la bonne hauteur est détectée de façon stable ou si tu appuies sur « Passer ». Le chronomètre global termine le défi ; aucune limite de temps ne s’applique à chaque note.</p>
         </>
       )}
 
