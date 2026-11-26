@@ -239,9 +239,12 @@ export default function Home() {
   return (
     <main className="app-shell">
       <aside className="sidebar">
-        <Link href="/" className="brand">
+        <Link href="/" className="brand items-center! gap-1!">
           <Image src="/apple-touch-icon.png" alt="" width={34} height={34} className="brand-icon" />
-          <span>recorder<span className="brand-accent">reflex</span></span>
+          <span className="hidden! sm:block!">
+            <img src="/wave.png" className="w-full h-auto" alt="Wave" />
+            {/* recorder<span className="brand-accent">reflex</span> */}
+          </span>
         </Link>
         <div className="side-label">ESPACE DE TRAVAIL</div>
         <Link className="nav-link active" href="/"><House aria-hidden="true" /> Tableau de bord</Link>
