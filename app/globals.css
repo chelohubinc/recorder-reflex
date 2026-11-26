@@ -137,3 +137,17 @@ button,a { font:inherit; } button { color:inherit; } a { color:inherit; text-dec
     transition: none;
   }
 }
+
+
+.training-heading-actions { display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end; }
+.stop-session-button {
+  min-height:32px;display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:0 10px;border:1px solid #bd756b55;border-radius:8px;
+  background:transparent;color:#c77b70;font-size:10px;font-weight:650;cursor:pointer;
+  transition:background .18s,border-color .18s,color .18s;
+}
+.stop-session-button svg { width:13px;height:13px; }
+.stop-session-button:hover { background:#bd756b18;border-color:#bd756b; }
+@media(max-width:480px) {
+  .training-heading-actions { flex-direction:column;align-items:flex-end; }
+}
