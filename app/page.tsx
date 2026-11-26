@@ -40,6 +40,7 @@ import {
   TrendingUp,
   Zap,
 } from "lucide-react";
+import Image from "next/image";
 
 const QUESTIONS_PER_SESSION = 10;
 
@@ -272,10 +273,14 @@ export default function Home() {
 
       <section className="main-area">
         <header className="topbar">
-          <div className="breadcrumb">Mon espace <span>/</span> <b>Vue d’ensemble</b></div>
+          <div className="breadcrumb">
+            {/* Mon espace <span>/</span> <b>Vue d’ensemble</b> */}
+          </div>
           <div className="top-actions">
             <span className="streak"><Star aria-hidden="true" /> {stats.sessionsStarted} séries commencées</span>
-            <button className="avatar" aria-label="Profil">A</button>
+            <button className="avatar rounded-full! overflow-hidden!" aria-label="Profil">
+              <Image src="https://www.gravatar.com/avatar/00000000000000000000000000000000?d=retro" alt="Cover" width={40} height={40} unoptimized className="w-full h-auto" />
+            </button>
           </div>
         </header>
 
