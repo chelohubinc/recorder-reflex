@@ -31,6 +31,7 @@ import {
   Music2,
   Play,
   RotateCw,
+  Square,
   Sparkles,
   Star,
   Sun,
@@ -39,6 +40,7 @@ import {
   TrendingUp,
   Zap,
 } from "lucide-react";
+import Image from "next/image";
 
 const QUESTIONS_PER_SESSION = 10;
 
@@ -112,6 +114,18 @@ export default function Home() {
     () => new Set(stats.notes.filter((item) => item.mastered).map((item) => item.noteId)),
     [stats.notes],
   );
+
+  function stopSession() {
+    // The session cleanup effect marks an unfinished session as abandoned.
+    setStarted(false);
+    setSessionFinished(false);
+    setSessionId(null);
+    setQuestionIds([]);
+    setQuestionIndex(0);
+    setFeedback(null);
+    setAnswer(emptyFingering());
+    setElapsedMs(0);
+  }
 
   function beginSession() {
     if (started && sessionId) abandonSession(sessionId);
@@ -259,15 +273,19 @@ export default function Home() {
 
       <section className="main-area">
         <header className="topbar">
-          <div className="breadcrumb">Mon espace <span>/</span> <b>Vue d’ensemble</b></div>
+          <div className="breadcrumb">
+            {/* Mon espace <span>/</span> <b>Vue d’ensemble</b> */}
+          </div>
           <div className="top-actions">
             <span className="streak"><Star aria-hidden="true" /> {stats.sessionsStarted} séries commencées</span>
-            <button className="avatar" aria-label="Profil">A</button>
+            <button className="avatar rounded-full! overflow-hidden!" aria-label="Profil">
+              <Image src="https://www.gravatar.com/avatar/00000000000000000000000000000000?d=retro" alt="Cover" width={40} height={40} unoptimized className="w-full h-auto" />
+            </button>
           </div>
         </header>
 
         <div className="content">
-          <section className="welcome-row">
+          <section className={`welcome-row dashboard-extra${started ? " is-hidden" : ""}`} aria-hidden={started}>
             <div>
               <div className="eyebrow"><span className="eyebrow-dot" /> TON ESPACE MUSICAL</div>
               <h1>Bonjour, musicien<span className="wave"><Sparkles aria-hidden="true" /></span></h1>
@@ -281,7 +299,7 @@ export default function Home() {
             </button>
           </section>
 
-          <section className="stats-grid" aria-label="Résumé de progression">
+          <section className={`stats-grid dashboard-extra${started ? " is-hidden" : ""}`} aria-label="Résumé de progression" aria-hidden={started}>
             <article className="stat-card">
               <div className="stat-top"><span>PRÉCISION</span><span className="stat-icon green"><Target aria-hidden="true" /></span></div>
               <div className="stat-value">{accuracy}<small>%</small></div>
@@ -302,7 +320,7 @@ export default function Home() {
             </article>
           </section>
 
-          <section className="dashboard-grid">
+          <section className={`dashboard-grid${started ? " session-active" : ""}`}>
             <article className="panel training-panel" id="training">
               <div className="panel-heading">
                 <div>
@@ -310,7 +328,14 @@ export default function Home() {
                   <h2>Note vers doigté</h2>
                   <p className="muted">Trouve la bonne position le plus vite possible.</p>
                 </div>
-                <div className="exercise-badge"><Timer aria-hidden="true" /> <span>{started ? `${(elapsedMs / 1000).toFixed(1)} s` : "Chrono prêt"}</span></div>
+                <div className="training-heading-actions">
+                  <div className="exercise-badge"><Timer aria-hidden="true" /> <span>{started ? `${(elapsedMs / 1000).toFixed(1)} s` : "Chrono prêt"}</span></div>
+                  {started && (
+                    <button type="button" className="stop-session-button" onClick={stopSession} aria-label="Arrêter la série">
+                      <Square aria-hidden="true" /> Arrêter
+                    </button>
+                  )}
+                </div>
               </div>
 
               {sessionFinished ? (
@@ -368,7 +393,7 @@ export default function Home() {
               )}
             </article>
 
-            <div className="right-column">
+            <div className={`right-column dashboard-extra${started ? " is-hidden" : ""}`} aria-hidden={started}>
               <article className="panel focus-panel">
                 <div className="panel-title-row">
                   <div><div className="eyebrow">TA PROGRESSION</div><h2>Un pas à la fois</h2></div>
@@ -399,7 +424,7 @@ export default function Home() {
             </div>
           </section>
 
-          <footer className="footer">
+          <footer className={`footer dashboard-extra${started ? " is-hidden" : ""}`} aria-hidden={started}>
             <span>Recorder Reflex <i>•</i> Pratique ton instrument, un réflexe à la fois.</span>
             <Link href="/lab" className="flex flex-wrap">Ouvrir le laboratoire <ArrowRight aria-hidden="true" /></Link>
           </footer>

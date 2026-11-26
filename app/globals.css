@@ -98,3 +98,56 @@ button,a { font:inherit; } button { color:inherit; } a { color:inherit; text-dec
 .mic-indicator svg { width:24px;height:24px; }
 .fast-controls .check-button svg { width:15px;height:15px;margin-right:5px;vertical-align:-3px; }
 .fast-controls .skip-button { display:inline-flex;align-items:center; }
+
+
+/* Focus mode: collapse secondary dashboard widgets while a training series is active. */
+.dashboard-extra {
+  max-height: 900px;
+  opacity: 1;
+  transform: translateY(0);
+  overflow: hidden;
+  transition:
+    max-height .42s cubic-bezier(.2,.75,.25,1),
+    opacity .28s ease,
+    transform .38s ease,
+    margin .38s ease,
+    padding .38s ease;
+  will-change: max-height, opacity, transform;
+}
+.dashboard-extra.is-hidden {
+  max-height: 0 !important;
+  opacity: 0;
+  transform: translateY(-12px);
+  margin-block: 0 !important;
+  padding-block: 0 !important;
+  border-width: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+.dashboard-grid.session-active {
+  grid-template-columns: minmax(0, 1fr);
+  transition: grid-template-columns .38s ease;
+}
+.dashboard-grid.session-active .training-panel {
+  min-height: 445px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-extra,
+  .dashboard-grid.session-active {
+    transition: none;
+  }
+}
+
+
+.training-heading-actions { display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end; }
+.stop-session-button {
+  min-height:32px;display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:0 10px;border:1px solid #bd756b55;border-radius:8px;
+  background:transparent;color:#c77b70;font-size:10px;font-weight:650;cursor:pointer;
+  transition:background .18s,border-color .18s,color .18s;
+}
+.stop-session-button svg { width:13px;height:13px; }
+.stop-session-button:hover { background:#bd756b18;border-color:#bd756b; }
+@media(max-width:480px) {
+  .training-heading-actions { flex-direction:column;align-items:flex-end; }
+}
