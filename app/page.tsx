@@ -31,6 +31,7 @@ import {
   Music2,
   Play,
   RotateCw,
+  Square,
   Sparkles,
   Star,
   Sun,
@@ -112,6 +113,18 @@ export default function Home() {
     () => new Set(stats.notes.filter((item) => item.mastered).map((item) => item.noteId)),
     [stats.notes],
   );
+
+  function stopSession() {
+    // The session cleanup effect marks an unfinished session as abandoned.
+    setStarted(false);
+    setSessionFinished(false);
+    setSessionId(null);
+    setQuestionIds([]);
+    setQuestionIndex(0);
+    setFeedback(null);
+    setAnswer(emptyFingering());
+    setElapsedMs(0);
+  }
 
   function beginSession() {
     if (started && sessionId) abandonSession(sessionId);
@@ -310,7 +323,14 @@ export default function Home() {
                   <h2>Note vers doigté</h2>
                   <p className="muted">Trouve la bonne position le plus vite possible.</p>
                 </div>
-                <div className="exercise-badge"><Timer aria-hidden="true" /> <span>{started ? `${(elapsedMs / 1000).toFixed(1)} s` : "Chrono prêt"}</span></div>
+                <div className="training-heading-actions">
+                  <div className="exercise-badge"><Timer aria-hidden="true" /> <span>{started ? `${(elapsedMs / 1000).toFixed(1)} s` : "Chrono prêt"}</span></div>
+                  {started && (
+                    <button type="button" className="stop-session-button" onClick={stopSession} aria-label="Arrêter la série">
+                      <Square aria-hidden="true" /> Arrêter
+                    </button>
+                  )}
+                </div>
               </div>
 
               {sessionFinished ? (
