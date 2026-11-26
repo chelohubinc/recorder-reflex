@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { NOTES } from "@/features/music/data/notes";
 import { RecorderDiagram } from "@/components/recorder/RecorderDiagram";
 
 export default function LearnPage() {
   return (
     <main className="simple-page">
-      <Link href="/" className="simple-back">← Retour au tableau de bord</Link>
+      <Link href="/" className="simple-back"><ArrowLeft aria-hidden="true" /> Retour au tableau de bord</Link>
       <div className="eyebrow" style={{ marginTop: 28 }}>APPRENTISSAGE GUIDÉ</div>
       <h1>Les notes de ta flûte</h1>
       <p className="muted">Explore les doigtés du système allemand, de Do5 à Ré6.</p>

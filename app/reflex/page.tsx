@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import "../fast-mode/fast-mode.css";
+import { ArrowLeft, ArrowRight, RotateCw, Zap } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { generateQuestionSequence } from "@/features/training/engine/question-sequence";
 import { NOTES } from "@/features/music/data/notes";
@@ -106,7 +107,7 @@ export default function ReflexPage(){
 
     return (
         <main className="simple-page fast-page">
-            <Link href="/" className="simple-back">← Retour au tableau de bord</Link>
+            <Link href="/" className="simple-back"><ArrowLeft aria-hidden="true" /> Retour au tableau de bord</Link>
             <div className="eyebrow" style={{ marginTop: 28 }}>RECORDER REFLEX / MODE RÉFLEXE</div>
             <h1>Notes enchaînées</h1>
             <p className="muted">Les notes se succèdent : joue chaque note sur ta flûte.</p>
@@ -118,7 +119,7 @@ export default function ReflexPage(){
                             <div className="eyebrow">CHOISIS TON DÉFI</div>
                             <h2>Combien de temps veux-tu tenir ?</h2>
                         </div>
-                        <span className="focus-spark">⚡</span>
+                        <Zap className="focus-spark" aria-hidden="true" />
                     </div>
 
                     <div className="duration-options" style={{ marginTop: 18 }}>
@@ -144,7 +145,7 @@ export default function ReflexPage(){
                     </div>
                     
                     <p className="muted" style={{ marginTop: 16 }}>Do5 à Ré6 · ordre aléatoire sans répétition immédiate · doigtés allemands.</p>
-                    <button className="primary-button" style={{ marginTop: 20 }} onClick={begin}>Démarrer le défi <span>→</span></button>
+                    <button className="primary-button" style={{ marginTop: 20 }} onClick={begin}>Démarrer le défi <ArrowRight aria-hidden="true" /></button>
                 </section>
             )}
 
@@ -177,7 +178,7 @@ export default function ReflexPage(){
                     <h2>Bien joué !</h2>
                     <div className="fast-note" style={{ fontSize: 64 }}>{played}</div>
                     <p className="fast-instruction">notes jouées en {duration} secondes</p>
-                    <button className="primary-button" onClick={begin}>Recommencer <span>↻</span></button>
+                    <button className="primary-button" onClick={begin}>Recommencer <RotateCw aria-hidden="true" /></button>
                 </section>
             )}
         </main>

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { NOTES } from "@/features/music/data/notes";
 import { calculateProgressStatistics } from "@/features/progress/engine/statistics";
 import { useProgressSnapshot } from "@/lib/useProgress";
@@ -11,7 +12,7 @@ export default function ProgressPage() {
 
   return (
     <main className="simple-page">
-      <Link href="/" className="simple-back">← Retour au tableau de bord</Link>
+      <Link href="/" className="simple-back"><ArrowLeft aria-hidden="true" /> Retour au tableau de bord</Link>
       <div className="eyebrow" style={{ marginTop: 28 }}>TES STATISTIQUES</div>
       <h1>Ta progression</h1>
       <p className="muted">Tes performances sont enregistrées localement sur cet appareil.</p>

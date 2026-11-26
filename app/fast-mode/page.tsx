@@ -3,6 +3,7 @@
 import "./fast-mode.css";
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import { ArrowLeft, ArrowRight, Check, RotateCw, Zap } from "lucide-react";
 import { NOTES } from "@/features/music/data/notes";
 import { generateQuestionSequence } from "@/features/training/engine/question-sequence";
 import { completeQuestion, completeSession, recordAttempt, startSession } from "@/lib/progress";
@@ -125,7 +126,7 @@ export default function FastModePage() {
 
   return (
     <main className="simple-page fast-page">
-      <Link href="/" className="simple-back">← Retour au tableau de bord</Link>
+      <Link href="/" className="simple-back"><ArrowLeft aria-hidden="true" /> Retour au tableau de bord</Link>
       <div className="eyebrow" style={{ marginTop: 28 }}>RECORDER REFLEX / MODE RÉFLEXE</div>
       <h1>Notes enchaînées</h1>
       <p className="muted">Les notes se succèdent : joue chaque note sur ta flûte, puis valide pour passer immédiatement à la suivante.</p>
@@ -134,7 +135,7 @@ export default function FastModePage() {
         <section className="panel" style={{ marginTop: 22 }}>
           <div className="panel-title-row">
             <div><div className="eyebrow">CHOISIS TON DÉFI</div><h2>Combien de temps veux-tu tenir ?</h2></div>
-            <span className="focus-spark">⚡</span>
+            <Zap className="focus-spark" aria-hidden="true" />
           </div>
           <div className="duration-options" style={{ marginTop: 18 }}>
             {DURATIONS.map((value) => (
@@ -144,7 +145,7 @@ export default function FastModePage() {
             ))}
           </div>
           <p className="muted" style={{ marginTop: 16 }}>Do5 à Ré6 · ordre aléatoire sans répétition immédiate · doigtés allemands.</p>
-          <button className="primary-button" style={{ marginTop: 20 }} onClick={begin}>Démarrer le défi <span>→</span></button>
+          <button className="primary-button" style={{ marginTop: 20 }} onClick={begin}>Démarrer le défi <ArrowRight aria-hidden="true" /></button>
         </section>
       )}
 
@@ -163,8 +164,8 @@ export default function FastModePage() {
             <div className="fast-note">{note.name}<sup>{note.octave}</sup></div>
             <p className="fast-instruction">Joue cette note sur ta flûte à bec soprano.</p>
             <div className="fast-controls">
-              <button className="check-button" onClick={() => submitNote(true)}>✓ J&apos;ai joué cette note</button>
-              <button className="skip-button" onClick={() => submitNote(false)}>Passer →</button>
+              <button className="check-button" onClick={() => submitNote(true)}><Check aria-hidden="true" /> J&apos;ai joué cette note</button>
+              <button className="skip-button" onClick={() => submitNote(false)}>Passer <ArrowRight aria-hidden="true" /></button>
             </div>
             {lastReaction !== null && <p className="fast-footnote">Dernière réaction : {(lastReaction / 1000).toFixed(2)} s</p>}
           </section>
@@ -188,7 +189,7 @@ export default function FastModePage() {
             <div className="fast-metric"><strong>{averageReaction ? (averageReaction / 1000).toFixed(2) + " s" : "—"}</strong><span>Réaction moyenne</span></div>
             <div className="fast-metric"><strong>{bestReaction !== null ? (bestReaction / 1000).toFixed(2) + " s" : "—"}</strong><span>Meilleure réaction</span></div>
           </div>
-          <button className="primary-button" onClick={begin}>Recommencer <span>↻</span></button>
+          <button className="primary-button" onClick={begin}>Recommencer <RotateCw aria-hidden="true" /></button>
         </section>
       )}
     </main>
