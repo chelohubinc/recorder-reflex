@@ -188,10 +188,10 @@ export default function ReflexPage() {
               ) : (
                 <button className="check-button" onClick={pauseChallenge}><Pause aria-hidden="true" /> Pause</button>
               )}
-              <button className="skip-button" onClick={abandonChallenge}><StopCircle aria-hidden="true" /> Abandonner</button>
+              <button className="skip-button" onClick={abandonChallenge}>Abandonner</button>
             </div>
           </section>
-          <p className="fast-footnote">Le compteur mesure les notes affichées, pas les notes réellement jouées. La reconnaissance par microphone n'est pas encore connectée à ce défi.</p>
+          <p className="fast-footnote">Le compteur mesure les notes affichées, pas les notes réellement jouées. La reconnaissance par microphone n&apos;est pas encore connectée à ce défi.</p>
         </>
       )}
 
