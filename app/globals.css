@@ -1,7 +1,9 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root { --bg:#f6f7f4; --surface:#fff; --ink:#17241e; --muted:#7d8882; --line:#e9ede9; --green:#1b7653; --green-dark:#145c40; --soft-green:#eaf4ee; --card-shadow:0 8px 30px rgba(27,49,37,.035); }
-:root[data-theme="dark"] { --bg:#111814; --surface:#1a241e; --ink:#eef5ef; --muted:#a1b0a7; --line:#2c3931; --green:#72c69d; --green-dark:#98d9b5; --soft-green:#263a2e; --card-shadow:0 8px 30px rgba(0,0,0,.12); }
+:root[data-theme="dark"] { color-scheme: dark; --bg:#111814; --surface:#1a241e; --ink:#eef5ef; --muted:#a1b0a7; --line:#2c3931; --green:#72c69d; --green-dark:#98d9b5; --soft-green:#263a2e; --card-shadow:0 8px 30px rgba(0,0,0,.12); }
 * { box-sizing:border-box; }
 html { scroll-behavior:smooth; }
 body { margin:0; background:var(--bg); color:var(--ink); font-family:Arial,Helvetica,sans-serif; font-size:14px; transition:background .2s,color .2s; }
@@ -130,6 +132,23 @@ button,a { font:inherit; } button { color:inherit; } a { color:inherit; text-dec
 }
 .dashboard-grid.session-active .training-panel {
   min-height: 445px;
+}
+.sidebar {
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+}
+.sidebar .nav-link {
+  height: auto;
+  min-height: 48px;
+  padding-block: 10px;
+  line-height: 1.35;
+}
+@media (max-width: 640px) {
+  .sidebar .nav-link {
+    height: 43px;
+    min-height: 43px;
+    padding-block: 0;
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   .dashboard-extra,
