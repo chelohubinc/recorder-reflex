@@ -53,9 +53,14 @@ export function RecorderDiagram({
         ? event.code.slice("Numpad".length)
         : event.key;
       const holeNumber = Number(digit);
-      if (!Number.isInteger(holeNumber) || holeNumber < 1 || holeNumber > 7) return;
+      if (!Number.isInteger(holeNumber) || holeNumber < 0 || holeNumber > 7) return;
 
       event.preventDefault();
+      if (holeNumber === 0) {
+        onChange({ ...value, thumb: nextHoleState(value.thumb, true) });
+        return;
+      }
+
       const index = holeNumber - 1;
       const next = nextHoleState(value.front[index], true);
       const front = [...value.front] as Fingering["front"];
@@ -120,7 +125,7 @@ export function RecorderDiagram({
         <span><i className="legend-dot open" /> Ouvert</span>
         <span><i className="legend-dot half" /> À moitié</span>
       </div>
-      {interactive && <p className="diagram-hint">Touchez un trou ou utilisez les touches 1 à 7 (clavier numérique inclus) pour changer son état : couvert → à moitié → ouvert.</p>}
+      {interactive && <p className="diagram-hint">Touchez un trou ou utilisez 0 pour le pouce et 1 à 7 pour les trous avant (clavier numérique inclus) : couvert → à moitié → ouvert.</p>}
     </div>
   );
 }
