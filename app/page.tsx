@@ -267,7 +267,7 @@ export default function Home() {
         </header>
 
         <div className="content">
-          <section className="welcome-row">
+          <section className={`welcome-row dashboard-extra${started ? " is-hidden" : ""}`} aria-hidden={started}>
             <div>
               <div className="eyebrow"><span className="eyebrow-dot" /> TON ESPACE MUSICAL</div>
               <h1>Bonjour, musicien<span className="wave"><Sparkles aria-hidden="true" /></span></h1>
@@ -281,7 +281,7 @@ export default function Home() {
             </button>
           </section>
 
-          <section className="stats-grid" aria-label="Résumé de progression">
+          <section className={`stats-grid dashboard-extra${started ? " is-hidden" : ""}`} aria-label="Résumé de progression" aria-hidden={started}>
             <article className="stat-card">
               <div className="stat-top"><span>PRÉCISION</span><span className="stat-icon green"><Target aria-hidden="true" /></span></div>
               <div className="stat-value">{accuracy}<small>%</small></div>
@@ -302,7 +302,7 @@ export default function Home() {
             </article>
           </section>
 
-          <section className="dashboard-grid">
+          <section className={`dashboard-grid${started ? " session-active" : ""}`}>
             <article className="panel training-panel" id="training">
               <div className="panel-heading">
                 <div>
@@ -368,7 +368,7 @@ export default function Home() {
               )}
             </article>
 
-            <div className="right-column">
+            <div className={`right-column dashboard-extra${started ? " is-hidden" : ""}`} aria-hidden={started}>
               <article className="panel focus-panel">
                 <div className="panel-title-row">
                   <div><div className="eyebrow">TA PROGRESSION</div><h2>Un pas à la fois</h2></div>
@@ -399,7 +399,7 @@ export default function Home() {
             </div>
           </section>
 
-          <footer className="footer">
+          <footer className={`footer dashboard-extra${started ? " is-hidden" : ""}`} aria-hidden={started}>
             <span>Recorder Reflex <i>•</i> Pratique ton instrument, un réflexe à la fois.</span>
             <Link href="/lab" className="flex flex-wrap">Ouvrir le laboratoire <ArrowRight aria-hidden="true" /></Link>
           </footer>
