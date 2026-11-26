@@ -6,6 +6,7 @@ export function generateQuestionSequence(
   noteIds: readonly string[],
   count = 10,
   random: () => number = Math.random,
+  previousNoteId?: string,
 ): string[] {
   if (noteIds.length === 0) throw new Error("At least one note is required.");
   if (!Number.isInteger(count) || count < 1) throw new Error("Question count must be a positive integer.");
@@ -13,7 +14,7 @@ export function generateQuestionSequence(
   const sequence: string[] = [];
 
   for (let index = 0; index < count; index += 1) {
-    const previous = sequence[index - 1];
+    const previous = index === 0 ? previousNoteId : sequence[index - 1];
     const pool = noteIds.length > 1 && previous
       ? noteIds.filter((noteId) => noteId !== previous)
       : [...noteIds];

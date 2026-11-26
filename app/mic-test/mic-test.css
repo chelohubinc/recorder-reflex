@@ -1,0 +1,141 @@
+.mic-page {
+  width: min(100%, 900px);
+  margin: 0 auto;
+  padding: 34px clamp(16px, 4vw, 36px) 52px;
+}
+.mic-page > .mic-eyebrow { margin-top: 28px; }
+.mic-page > h1 {
+  margin: 8px 0 7px;
+  color: var(--ink);
+  font-size: clamp(28px, 4vw, 36px);
+  line-height: 1.12;
+  letter-spacing: -1.25px;
+}
+.mic-description { max-width: 650px; font-size: 12px; }
+.mic-card {
+  min-height: 340px;
+  margin: 24px 0 18px;
+  padding: clamp(24px, 5vw, 40px);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+  text-align: center;
+}
+.mic-indicator {
+  width: 54px;
+  height: 54px;
+  margin: 0 auto 12px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--soft-green);
+  color: var(--green);
+  font-size: 24px;
+}
+.mic-indicator.is-listening { animation: mic-pulse 1.5s infinite; }
+.mic-status {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: .75px;
+  text-transform: uppercase;
+}
+.mic-note {
+  height: 104px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--green);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(68px, 12vw, 92px);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -3px;
+}
+.mic-note sup {
+  align-self: center;
+  margin: 0 0 38px 4px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: .28em;
+  letter-spacing: 0;
+}
+.mic-placeholder { color: var(--line); }
+.mic-result { min-height: 66px; }
+.mic-frequency {
+  color: var(--muted);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.mic-frequency span { padding: 0 6px; color: #a7afa9; }
+.mic-range { margin-top: 10px; font-size: 12px; }
+.in-range { color: var(--green); }
+.out-range { color: #b07823; }
+.mic-hint { margin: 9px 0 10px; color: var(--muted); font-size: 12px; line-height: 1.6; }
+.mic-button {
+  min-height: 44px;
+  margin: 8px auto 0;
+  padding: 0 18px;
+  font-size: 12px;
+}
+.mic-button.stop-button { background: var(--muted); box-shadow: none; }
+.mic-button.stop-button:hover { background: var(--ink); }
+.mic-error {
+  max-width: 460px;
+  margin: 8px auto 0;
+  color: #a34e43;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.mic-info-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 18px 0;
+}
+.mic-info-grid article {
+  min-height: 122px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+}
+.mic-info-grid article > span {
+  color: var(--green);
+  font-size: 9px;
+  font-weight: 750;
+  letter-spacing: 1px;
+}
+.mic-info-grid h2 {
+  margin: 10px 0 6px;
+  font-size: 14px;
+  letter-spacing: -.2px;
+}
+.mic-info-grid p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.65;
+}
+.mic-privacy {
+  margin: 16px 0 0;
+  color: var(--muted);
+  font-size: 10px;
+  text-align: center;
+}
+.mic-page button:focus-visible,
+.mic-page a:focus-visible {
+  outline: 3px solid var(--green);
+  outline-offset: 3px;
+}
+@keyframes mic-pulse {
+  50% { box-shadow: 0 0 0 9px rgba(90, 167, 123, .14); }
+}
+@media (max-width: 640px) {
+  .mic-page { padding: 24px 14px 36px; }
+  .mic-card { padding: 24px 16px; }
+  .mic-info-grid { grid-template-columns: 1fr; }
+  .mic-info-grid article { min-height: 0; }
+  .mic-button { width: 100%; }
+}
