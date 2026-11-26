@@ -18,6 +18,8 @@ export default function MicrophoneTestPage() {
   const contextRef = useRef<AudioContext | null>(null);
   const frameRef = useRef<number | null>(null);
   const runIdRef = useRef(0);
+  const candidateRef = useRef<{ midi: number; count: number } | null>(null);
+  const frameCountRef = useRef(0);
 
   const stop = useCallback(() => {
     runIdRef.current++;
@@ -28,6 +30,8 @@ export default function MicrophoneTestPage() {
     const context = contextRef.current;
     contextRef.current = null;
     if (context && context.state !== "closed") void context.close();
+    candidateRef.current = null;
+    frameCountRef.current = 0;
     setListening(false);
     setNote(null);
     setQuiet(true);
@@ -38,6 +42,8 @@ export default function MicrophoneTestPage() {
   async function start() {
     setError(null);
     setNote(null);
+    candidateRef.current = null;
+    frameCountRef.current = 0;
     if (!navigator.mediaDevices?.getUserMedia) {
       setError("L’accès au microphone n’est pas disponible dans ce navigateur. Essaie avec un navigateur récent sur localhost ou en HTTPS.");
       return;
@@ -75,9 +81,24 @@ export default function MicrophoneTestPage() {
         analyser.getFloatTimeDomainData(samples);
         const estimate = detectPitch(samples, context!.sampleRate);
         if (estimate && estimate.clarity >= 0.65) {
-          setQuiet(false);
-          setNote({ ...describePitch(estimate.frequency), frequency: estimate.frequency });
+          const pitch = describePitch(estimate.frequency);
+          const previous = candidateRef.current;
+          candidateRef.current = previous?.midi === pitch.midi
+            ? { midi: pitch.midi, count: previous.count + 1 }
+            : { midi: pitch.midi, count: 1 };
+
+          // Require several consecutive frames with the same pitch before displaying it.
+          if (candidateRef.current.count >= 3) {
+            setQuiet(false);
+            frameCountRef.current++;
+            // Avoid re-rendering at the display refresh rate; update the readout ~10 times/s.
+            if (frameCountRef.current % 6 === 0) {
+              setNote({ ...pitch, frequency: estimate.frequency });
+            }
+          }
         } else {
+          candidateRef.current = null;
+          frameCountRef.current = 0;
           setQuiet(true);
           setNote(null);
         }
