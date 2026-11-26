@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import {
   nextHoleState,
   type Fingering,
@@ -35,6 +36,36 @@ export function RecorderDiagram({
     front[target] = state;
     onChange({ ...value, front });
   }
+
+  // Keyboard shortcuts mirror mouse interaction: open -> closed -> half -> open.
+  useEffect(() => {
+    if (!interactive) return;
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.repeat || event.ctrlKey || event.metaKey || event.altKey) return;
+      const target = event.target;
+      if (target instanceof HTMLElement && (
+        target.isContentEditable ||
+        target.closest("input, textarea, select, [contenteditable='true']")
+      )) return;
+
+      const digit = event.code.startsWith("Numpad")
+        ? event.code.slice("Numpad".length)
+        : event.key;
+      const holeNumber = Number(digit);
+      if (!Number.isInteger(holeNumber) || holeNumber < 1 || holeNumber > 7) return;
+
+      event.preventDefault();
+      const index = holeNumber - 1;
+      const next = nextHoleState(value.front[index], true);
+      const front = [...value.front] as Fingering["front"];
+      front[index] = next;
+      onChange({ ...value, front });
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [interactive, onChange, value]);
 
   function renderHole(
     state: HoleState,
@@ -89,7 +120,7 @@ export function RecorderDiagram({
         <span><i className="legend-dot open" /> Ouvert</span>
         <span><i className="legend-dot half" /> À moitié</span>
       </div>
-      {interactive && <p className="diagram-hint">Touchez un trou pour changer son état.</p>}
+      {interactive && <p className="diagram-hint">Touchez un trou ou utilisez les touches 1 à 7 (clavier numérique inclus) pour changer son état : couvert → à moitié → ouvert.</p>}
     </div>
   );
 }
