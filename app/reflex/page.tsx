@@ -235,7 +235,7 @@ export default function ReflexPage() {
           candidateRef.current = previous?.midi === pitch.midi
             ? { midi: pitch.midi, count: previous.count + 1 }
             : { midi: pitch.midi, count: 1 };
-          if (candidateRef.current.count >= 4 && !resolvingRef.current) advanceRef.current(true);
+          if (candidateRef.current.count >= 8 && !resolvingRef.current) advanceRef.current(true);
         } else candidateRef.current = null;
       } else {
         candidateRef.current = null;
