@@ -1,21 +1,35 @@
 export type PitchEstimate = {
   frequency: number;
+  /** Confidence-like score in [0, 1]. Higher is better. */
   clarity: number;
 };
+
+type PitchOptions = { minHz?: number; maxHz?: number; threshold?: number };
 
 /** YIN difference-function pitch estimate for a monophonic instrument signal. */
 export function detectPitch(
   samples: Float32Array,
   sampleRate: number,
-  options: { minHz?: number; maxHz?: number; threshold?: number } = {},
+  options: PitchOptions = {},
 ): PitchEstimate | null {
   const { minHz = 390, maxHz = 1_250, threshold = 0.16 } = options;
+  if (
+    !Number.isFinite(sampleRate) || sampleRate <= 0 ||
+    !Number.isFinite(minHz) || !Number.isFinite(maxHz) ||
+    minHz <= 0 || maxHz <= minHz ||
+    !Number.isFinite(threshold) || threshold <= 0 || threshold >= 1 ||
+    samples.length < 8
+  ) return null;
+
   const minTau = Math.max(2, Math.floor(sampleRate / maxHz));
   const maxTau = Math.min(Math.floor(sampleRate / minHz), Math.floor(samples.length / 2) - 1);
-  if (maxTau <= minTau || sampleRate <= 0) return null;
+  if (maxTau <= minTau) return null;
 
   let energy = 0;
-  for (const sample of samples) energy += sample * sample;
+  for (const sample of samples) {
+    if (!Number.isFinite(sample)) return null;
+    energy += sample * sample;
+  }
   if (Math.sqrt(energy / samples.length) < 0.008) return null;
 
   const differences = new Float64Array(maxTau + 1);
@@ -29,6 +43,7 @@ export function detectPitch(
     differences[tau] = difference;
   }
 
+  // Cumulative mean normalized difference function from the YIN algorithm.
   const normalized = new Float64Array(maxTau + 1);
   normalized[0] = 1;
   let runningSum = 0;
@@ -46,6 +61,7 @@ export function detectPitch(
     }
   }
 
+  // If the threshold was not crossed, accept only a clearly defined minimum.
   if (selectedTau < 0) {
     let best = threshold;
     for (let tau = minTau; tau <= maxTau; tau++) {
@@ -64,14 +80,17 @@ export function detectPitch(
   const adjustment = denominator === 0 ? 0 : (right - left) / denominator;
   const refinedTau = selectedTau + Math.max(-1, Math.min(1, adjustment));
   const frequency = sampleRate / refinedTau;
-  if (frequency < minHz || frequency > maxHz) return null;
+  if (!Number.isFinite(frequency) || frequency < minHz || frequency > maxHz) return null;
 
-  return { frequency, clarity: 1 - center };
+  return { frequency, clarity: Math.max(0, Math.min(1, 1 - center)) };
 }
 
 const NOTE_NAMES = ["Do", "Do♯", "Ré", "Ré♯", "Mi", "Fa", "Fa♯", "Sol", "Sol♯", "La", "La♯", "Si"] as const;
 
 export function describePitch(frequency: number) {
+  if (!Number.isFinite(frequency) || frequency <= 0) {
+    throw new RangeError("Frequency must be a finite positive number.");
+  }
   const midiFloat = 69 + 12 * Math.log2(frequency / 440);
   const midi = Math.round(midiFloat);
   return {
