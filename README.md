@@ -1,36 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Recorder Reflex
 
-## Getting Started
+Recorder Reflex is a web app for learning soprano recorder fingerings in C using the German fingering system and improving note-playing reflexes. It includes a nine-note reference, from C5 to D6, and exercises with or without microphone-based pitch detection.
 
-First, run the development server:
+## Features
+
+- **Dashboard**: start an exercise and review your results.
+- **Training**: identify the fingering for a note and submit your answer.
+- **Note sequences**: take a timed challenge and confirm each note manually.
+- **Reflex mode**: play the displayed note; the microphone detects its pitch and advances the exercise.
+- **Microphone test**: see the detected note and its tuning deviation.
+- **Learn**: explore fingerings for all nine reference notes.
+- **Interactive recorder**: try fingerings by opening, covering, or half-covering the holes.
+- **Progress**: review your answers, reaction times, and results by note.
+
+Results are saved in your browser's local storage. They stay on this device and are not synced across devices. Audio features require microphone permission. Your browser must support the Web Audio API and `getUserMedia` (available on `localhost` or over HTTPS).
+
+## Requirements
+
+- Node.js **20.9 or later**
+- npm
+
+## Get started
 
 ```bash
+npm ci
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Commands
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Command | Description |
+| --- | --- |
+| `npm run dev` | Start the Next.js development server. |
+| `npm run build` | Build the app for production. |
+| `npm start` | Start the production server after running `npm run build`. |
+| `npm run lint` | Check the code with ESLint. |
+| `npm test` | Run the tests with Vitest. |
+| `npm run test:watch` | Run Vitest in watch mode. |
 
-## Learn More
+## Project structure
 
-To learn more about Next.js, take a look at the following resources:
+```text
+app/                  App pages, layout, and styles
+components/recorder/  Interactive recorder components
+features/audio/       Pitch detection and matching
+features/music/       Notes and fingerings
+features/progress/    Progress statistics
+features/training/    Exercise logic
+lib/                  Local persistence and shared utilities
+docs/                 Musical references
+public/               Icons and static assets
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Technologies
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Next.js 16, React 19, TypeScript, Tailwind CSS, and Vitest.
