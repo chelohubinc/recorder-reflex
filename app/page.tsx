@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { NOTES } from "@/features/music/data/notes";
 import { type Fingering } from "@/features/music/types/fingering";
 import { evaluateFingering } from "@/features/training/engine/evaluate-fingering";
@@ -40,7 +41,6 @@ import {
   TrendingUp,
   Zap,
 } from "lucide-react";
-import Image from "next/image";
 
 const QUESTIONS_PER_SESSION = 10;
 
@@ -240,7 +240,7 @@ export default function Home() {
     <main className="app-shell">
       <aside className="sidebar">
         <Link href="/" className="brand">
-          <span className="brand-icon"><Music2 className="brand-icon-mark" aria-hidden="true" /></span>
+          <Image src="/apple-touch-icon.png" alt="" width={34} height={34} className="brand-icon" />
           <span>recorder<span className="brand-accent">reflex</span></span>
         </Link>
         <div className="side-label">ESPACE DE TRAVAIL</div>
